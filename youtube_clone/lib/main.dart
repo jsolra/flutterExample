@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:youtube_clone/src/app.dart';
 import 'package:youtube_clone/src/binding/init_binding.dart';
@@ -9,7 +7,6 @@ import 'package:youtube_clone/src/components/youtube_detail_component.dart';
 import 'package:youtube_clone/src/controller/youtube_detail_controller.dart';
 import 'package:youtube_clone/src/controller/youtube_search_controller.dart';
 import 'package:youtube_clone/src/pages/search_page.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 void main() {
   // WidgetsFlutterBinding.ensureInitialized();
