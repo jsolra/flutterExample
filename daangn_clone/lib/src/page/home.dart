@@ -1,22 +1,11 @@
-import 'package:daangn/src/page/detail.dart';
-import 'package:daangn/src/repository/contents_repository.dart';
+import 'package:daangn/src/controller/app_controller.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
-class Home extends StatefulWidget {
-  Home({Key? key}) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  ContentsRepository contentsRepository = ContentsRepository();
-
+class Home extends StatelessWidget {
   List<Map<String, String>> datas = [];
-  String _currentLocation = 'ara';
 
   final Map<String, String> locationTypeToString = {
     "ara": '아라동',
@@ -37,9 +26,7 @@ class _HomeState extends State<Home> {
       title: GestureDetector(
         child: PopupMenuButton<String>(
           onSelected: (String where) {
-            setState(() {
-              _currentLocation = where;
-            });
+            AppController.to.currentLocation(where);
           },
           offset: Offset(0, 30),
           shape: ShapeBorder.lerp(
@@ -55,8 +42,9 @@ class _HomeState extends State<Home> {
           },
           child: Row(
             children: [
-              Text(locationTypeToString[_currentLocation]!),
-              Icon(Icons.arrow_drop_down)
+              Obx(() => Text(
+                  locationTypeToString[AppController.to.currentLocation]!)),
+              Icon(Icons.keyboard_arrow_down)
             ],
           ),
         ),
@@ -78,14 +66,17 @@ class _HomeState extends State<Home> {
   }
 
   Future<List<Map<String, String>>> _loadContents() async {
-    List<Map<String, String>> responseData =
-        await contentsRepository.loadContentsFromLocation(_currentLocation);
+    List<Map<String, String>> responseData = await AppController.to
+        .loadContentsFromLocation(AppController.to.currentLocation.value);
     return responseData;
   }
 
   Widget _bodyWidget() {
-    return FutureBuilder(
-        future: _loadContents(),
+    return Obx(
+      () => FutureBuilder(
+        future: AppController.to
+            .loadContentsFromLocation(AppController.to.currentLocation.value),
+        // future: _loadContents(),
         builder: (BuildContext context, dynamic snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(child: CircularProgressIndicator());
@@ -103,7 +94,9 @@ class _HomeState extends State<Home> {
             return Center(
               child: Text('해당 지역의 데이터가 없습니다'),
             );
-        });
+        },
+      ),
+    );
   }
 
   Widget _makeDataList(List<dynamic> datas) {
@@ -121,9 +114,12 @@ class _HomeState extends State<Home> {
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return DetailContentView(data: datas[index]);
-            }));
+            AppController.to.selectedData = datas[index];
+            Get.toNamed('/detail/${datas[index]['cid']}');
+
+            // Navigator.push(context, MaterialPageRoute(builder: (context) {
+            //   return DetailContentView(data: datas[index]);
+            // }));
             // print(datas[index]['title']);
           },
           child: Container(

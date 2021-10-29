@@ -1,9 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:daangn/src/component/manor_temperature_widget.dart';
-import 'package:daangn/src/repository/contents_repository.dart';
+import 'package:daangn/src/controller/detail_controller.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class DetailContentView extends StatefulWidget {
   Map<String, dynamic> data;
@@ -15,9 +16,9 @@ class DetailContentView extends StatefulWidget {
 
 class _DetailContentViewState extends State<DetailContentView>
     with SingleTickerProviderStateMixin {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+  DetailController controller = Get.find();
 
-  late ContentsRepository contentsRepository;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   late Size size;
   List<String> imgList = [];
@@ -27,8 +28,6 @@ class _DetailContentViewState extends State<DetailContentView>
   double scrollpositionToAlpha = 0;
   CarouselController _controller = CarouselController();
 
-  bool isMyFavoriteContent = false;
-
   late AnimationController _animationController;
   late Animation _colorTween;
 
@@ -36,7 +35,6 @@ class _DetailContentViewState extends State<DetailContentView>
   void initState() {
     // TODO: implement initState
     super.initState();
-    contentsRepository = ContentsRepository();
     _loadMyFavoriteContentState();
 
     _animationController = AnimationController(vsync: this);
@@ -55,12 +53,9 @@ class _DetailContentViewState extends State<DetailContentView>
   }
 
   void _loadMyFavoriteContentState() async {
-    bool ck =
-        await contentsRepository.isMyFavoriteContents(widget.data["cid"]!);
+    bool ck = await controller.isMyFavoriteContents(widget.data["cid"]!);
     print(ck);
-    setState(() {
-      isMyFavoriteContent = ck;
-    });
+    controller.isMyFavoriteContent(ck);
   }
 
   @override
@@ -101,7 +96,7 @@ class _DetailContentViewState extends State<DetailContentView>
       leading: IconButton(
         icon: _makeIcon(Icons.arrow_back),
         onPressed: () {
-          Navigator.pop(context);
+          Get.back();
         },
       ),
       actions: [
@@ -119,31 +114,31 @@ class _DetailContentViewState extends State<DetailContentView>
       child: Row(
         children: [
           GestureDetector(
-            onTap: () async {
-              if (isMyFavoriteContent) {
+            onTap: () {
+              if (controller.isMyFavoriteContent.value) {
                 //제거
-                await contentsRepository
-                    .deleteFavoriteContent(widget.data['cid']!);
-              } else
-                contentsRepository.addMyFavoriteContent(widget.data);
+                controller.deleteFavoriteContent(widget.data['cid']!);
+              } else {
+                //추가
+                controller.addMyFavoriteContent(widget.data);
+              }
 
-              setState(() {
-                print('관심상품 이벤트 발생');
-                isMyFavoriteContent = !isMyFavoriteContent;
-              });
               scaffoldKey.currentState!.showSnackBar(SnackBar(
-                content: Text(
-                    isMyFavoriteContent ? "관심 목록에 추가되었습니다" : "관심 목록에서 제거되었습니다"),
+                content: Text(controller.isMyFavoriteContent.value
+                    ? "관심 목록에 추가되었습니다"
+                    : "관심 목록에서 제거되었습니다"),
                 duration: Duration(milliseconds: 1000),
               ));
             },
-            child: SvgPicture.asset(
-              isMyFavoriteContent
-                  ? 'assets/svg/heart_on.svg'
-                  : 'assets/svg/heart_off.svg',
-              width: 25,
-              height: 25,
-              color: Color(0xfff08f4f),
+            child: Obx(
+              () => SvgPicture.asset(
+                controller.isMyFavoriteContent.value
+                    ? 'assets/svg/heart_on.svg'
+                    : 'assets/svg/heart_off.svg',
+                width: 25,
+                height: 25,
+                color: Color(0xfff08f4f),
+              ),
             ),
           ),
           Container(

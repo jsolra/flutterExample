@@ -1,10 +1,58 @@
-/*
 import 'dart:convert';
 
 import 'package:daangn/src/repository/local_storage_repository.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 
-class ContentsRepository extends LocalStorageRepository {
-  final String MY_FAVORITE_STORE_KEY = 'MY_FAVORITE_STORE_KEY';
+class AppController extends GetxController {
+  static AppController get to => Get.find();
+
+  RxString currentLocation = 'ara'.obs;
+
+  final storage = new FlutterSecureStorage();
+
+  RxList<dynamic> favoriteContentList = [].obs;
+
+  @override
+  void onInit() {
+    // LocalStorageRepository.to.deleteAllStoreValuse();
+    loadFavoriteContents();
+  }
+
+  Map<String, dynamic>? selectedData;
+
+  // 즐겨찾기 목록 로드
+  void loadFavoriteContents() async {
+    String jsonString =
+        await LocalStorageRepository.to.getStoredValue(MY_FAVORITE_STORE_KEY);
+    print('jsonString  $jsonString ');
+    if (jsonString != '') {
+      List<dynamic> json = jsonDecode(jsonString);
+      favoriteContentList(json);
+    }
+  }
+
+  // 즐겨찾기 변경 내용 저장
+  void updateFavoriteContent(List favoriteContentList) async {
+    print(favoriteContentList);
+    await LocalStorageRepository.to
+        .setStoreValuse(MY_FAVORITE_STORE_KEY, jsonEncode(favoriteContentList));
+    // this.favoriteContentList.clear();
+    // this.favoriteContentList.addAll(favoriteContentList);
+  }
+
+  // 콘텐츠 찾기
+  Future<List<Map<String, String>>> loadContentsFromLocation(
+      String location) async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    // throw Exception();
+    return data[location];
+  }
+
+  Future<List> loadContentsFromFavorite() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    return favoriteContentList;
+  }
 
   Map<String, dynamic> data = {
     "ara": [
@@ -172,65 +220,6 @@ class ContentsRepository extends LocalStorageRepository {
       },
     ]
   };
-
-  Future<List<Map<String, String>>> loadContentsFromLocation(
-      String location) async {
-    await Future.delayed(Duration(milliseconds: 2000));
-    // throw Exception();
-    return data[location];
-  }
-
-  Future<List> loadFavoriteContents() async {
-    String jsonString = await this.getStoredValue(MY_FAVORITE_STORE_KEY);
-    print('jsonString  $jsonString ');
-    if (jsonString != '') {
-      List<dynamic> json = jsonDecode(jsonString);
-      return json;
-    } else
-      return [];
-  }
-
-  updateFavoriteContent(List favoriteContentList) async {
-    await this
-        .setStoreValuse(MY_FAVORITE_STORE_KEY, jsonEncode(favoriteContentList));
-  }
-
-  addMyFavoriteContent(Map<String, dynamic> content) async {
-    List<dynamic> favoriteContentList = await loadFavoriteContents();
-    // print(
-    //     'addMyFavoriteContent  ${favoriteContentList == []} || ${!(favoriteContentList is List)} = ${(favoriteContentList == [] || !(favoriteContentList is List))}');
-    if (favoriteContentList == [] || !(favoriteContentList is List)) {
-      favoriteContentList = [content];
-    } else
-      favoriteContentList.add(content);
-
-    updateFavoriteContent(favoriteContentList);
-  }
-
-  deleteFavoriteContent(String cid) async {
-    List<dynamic> favoriteContentList = await loadFavoriteContents();
-    if (favoriteContentList != [] && (favoriteContentList is List)) {
-      favoriteContentList.removeWhere((data) => data['cid'] == cid);
-    }
-    updateFavoriteContent(favoriteContentList);
-  }
-
-  isMyFavoriteContents(String cid) async {
-    bool ismyFavoriteContents = false;
-
-    List<dynamic> json = await loadFavoriteContents();
-
-    if (json == [] || !(json is List)) {
-      return false;
-    } else {
-      for (dynamic data in json) {
-        if (data['cid'] == cid) {
-          ismyFavoriteContents = true;
-          break;
-        }
-      }
-      return ismyFavoriteContents;
-    }
-  }
 }
-*/
+
+final String MY_FAVORITE_STORE_KEY = 'MY_FAVORITE_STORE_KEY';
