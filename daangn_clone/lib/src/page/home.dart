@@ -1,10 +1,11 @@
+import 'package:daangn/src/component/appbar_widget.dart';
 import 'package:daangn/src/controller/app_controller.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-class Home extends StatelessWidget {
+class HomePage extends StatelessWidget {
   List<Map<String, String>> datas = [];
 
   final Map<String, String> locationTypeToString = {
@@ -15,7 +16,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appbarWidget(),
+      appBar: AppBarWidget(),
       body: _bodyWidget(),
     );
   }

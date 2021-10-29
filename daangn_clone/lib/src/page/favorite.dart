@@ -1,12 +1,10 @@
 import 'package:daangn/src/controller/app_controller.dart';
-import 'package:daangn/src/page/detail.dart';
-import 'package:daangn/src/repository/contents_repository.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-class MyFavoriteContents extends StatelessWidget {
+class Favoritepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,6 @@
 import 'package:daangn/src/page/favorite.dart';
 import 'package:daangn/src/page/home.dart';
+import 'package:daangn/src/page/town_life.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -58,15 +59,15 @@ class _AppState extends State<App> {
   Widget _bodyWidget() {
     switch (_currentPageIndex) {
       case 0:
-        return Home();
+        return HomePage();
       case 1:
-        return Container();
+        return TownLifePage();
       case 2:
         return Container();
       case 3:
         return Container();
       case 4:
-        return MyFavoriteContents();
+        return Favoritepage();
       default:
         return Container();
     }
