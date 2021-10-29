@@ -3,26 +3,23 @@ import 'package:daangn/src/repository/contents_repository.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 
-class Home extends StatefulWidget {
-  Home({Key? key}) : super(key: key);
+class MyFavoriteContents extends StatefulWidget {
+  MyFavoriteContents({Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _MyFavoriteContentsState createState() => _MyFavoriteContentsState();
 }
 
-class _HomeState extends State<Home> {
-  ContentsRepository contentsRepository = ContentsRepository();
+class _MyFavoriteContentsState extends State<MyFavoriteContents> {
+  late ContentsRepository contentsRepository;
 
-  List<Map<String, String>> datas = [];
-  String _currentLocation = 'ara';
+  @override
+  void initState() {
+    super.initState();
+    contentsRepository = ContentsRepository();
+  }
 
-  final Map<String, String> locationTypeToString = {
-    "ara": '아라동',
-    "ora": '오라동',
-    "donam": '도남동',
-  };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,59 +30,18 @@ class _HomeState extends State<Home> {
 
   AppBar _appbarWidget() {
     return AppBar(
-      elevation: 1,
-      title: GestureDetector(
-        child: PopupMenuButton<String>(
-          onSelected: (String where) {
-            setState(() {
-              _currentLocation = where;
-            });
-          },
-          offset: Offset(0, 30),
-          shape: ShapeBorder.lerp(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              1),
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem(value: "ara", child: Text("아라동")),
-              PopupMenuItem(value: "ora", child: Text("오라동")),
-              PopupMenuItem(value: "donam", child: Text("도남동")),
-            ];
-          },
-          child: Row(
-            children: [
-              Text(locationTypeToString[_currentLocation]!),
-              Icon(Icons.arrow_drop_down)
-            ],
-          ),
+      title: Text(
+        '관심목록',
+        style: TextStyle(
+          fontSize: 15,
         ),
-        onTap: () {
-          print('click');
-        },
       ),
-      actions: [
-        IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-        IconButton(onPressed: () {}, icon: Icon(Icons.tune)),
-        IconButton(
-            onPressed: () {},
-            icon: SvgPicture.asset(
-              'assets/svg/bell.svg',
-              width: 22,
-            )),
-      ],
     );
-  }
-
-  Future<List<Map<String, String>>> _loadContents() async {
-    List<Map<String, String>> responseData =
-        await contentsRepository.loadContentsFromLocation(_currentLocation);
-    return responseData;
   }
 
   Widget _bodyWidget() {
     return FutureBuilder(
-        future: _loadContents(),
+        future: _loadMyFavoriteContentList(),
         builder: (BuildContext context, dynamic snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(child: CircularProgressIndicator());
@@ -106,6 +62,10 @@ class _HomeState extends State<Home> {
         });
   }
 
+  Future<dynamic> _loadMyFavoriteContentList() async {
+    return await contentsRepository.loadFavoriteContents();
+  }
+
   Widget _makeDataList(List<dynamic> datas) {
     int size = datas == null ? 0 : datas.length;
 
@@ -121,6 +81,7 @@ class _HomeState extends State<Home> {
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           onTap: () {
+            print(index);
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return DetailContentView(data: datas[index]);
             }));

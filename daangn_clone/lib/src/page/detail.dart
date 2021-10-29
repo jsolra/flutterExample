@@ -1,11 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:daangn/src/component/manor_temperature_widget.dart';
+import 'package:daangn/src/repository/contents_repository.dart';
 import 'package:daangn/src/util/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DetailContentView extends StatefulWidget {
-  Map<String, String> data;
+  Map<String, dynamic> data;
   DetailContentView({Key? key, required this.data}) : super(key: key);
 
   @override
@@ -15,6 +16,8 @@ class DetailContentView extends StatefulWidget {
 class _DetailContentViewState extends State<DetailContentView>
     with SingleTickerProviderStateMixin {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  late ContentsRepository contentsRepository;
 
   late Size size;
   List<String> imgList = [];
@@ -33,12 +36,14 @@ class _DetailContentViewState extends State<DetailContentView>
   void initState() {
     // TODO: implement initState
     super.initState();
+    contentsRepository = ContentsRepository();
+    _loadMyFavoriteContentState();
+
     _animationController = AnimationController(vsync: this);
     _colorTween = ColorTween(begin: Colors.white, end: Colors.black)
         .animate(_animationController);
 
     _scrollController.addListener(() {
-      print(_scrollController.offset);
       setState(() {
         scrollpositionToAlpha = _scrollController.offset;
 
@@ -46,6 +51,15 @@ class _DetailContentViewState extends State<DetailContentView>
 
         _animationController.value = scrollpositionToAlpha / 255;
       });
+    });
+  }
+
+  void _loadMyFavoriteContentState() async {
+    bool ck =
+        await contentsRepository.isMyFavoriteContents(widget.data["cid"]!);
+    print(ck);
+    setState(() {
+      isMyFavoriteContent = ck;
     });
   }
 
@@ -105,7 +119,14 @@ class _DetailContentViewState extends State<DetailContentView>
       child: Row(
         children: [
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+              if (isMyFavoriteContent) {
+                //제거
+                await contentsRepository
+                    .deleteFavoriteContent(widget.data['cid']!);
+              } else
+                contentsRepository.addMyFavoriteContent(widget.data);
+
               setState(() {
                 print('관심상품 이벤트 발생');
                 isMyFavoriteContent = !isMyFavoriteContent;

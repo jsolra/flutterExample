@@ -1,4 +1,10 @@
-class ContentsRepository {
+import 'dart:convert';
+
+import 'package:daangn/src/repository/local_storage_repository.dart';
+
+class ContentsRepository extends LocalStorageRepository {
+  final String MY_FAVORITE_STORE_KEY = 'MY_FAVORITE_STORE_KEY';
+
   Map<String, dynamic> data = {
     "ara": [
       {
@@ -171,5 +177,58 @@ class ContentsRepository {
     await Future.delayed(Duration(milliseconds: 2000));
     // throw Exception();
     return data[location];
+  }
+
+  Future<List> loadFavoriteContents() async {
+    String jsonString = await this.getStoredValue(MY_FAVORITE_STORE_KEY);
+    print('jsonString  $jsonString ');
+    if (jsonString != '') {
+      List<dynamic> json = jsonDecode(jsonString);
+      return json;
+    } else
+      return [];
+  }
+
+  updateFavoriteContent(List favoriteContentList) async {
+    await this
+        .setStoreValuse(MY_FAVORITE_STORE_KEY, jsonEncode(favoriteContentList));
+  }
+
+  addMyFavoriteContent(Map<String, dynamic> content) async {
+    List<dynamic> favoriteContentList = await loadFavoriteContents();
+    // print(
+    //     'addMyFavoriteContent  ${favoriteContentList == []} || ${!(favoriteContentList is List)} = ${(favoriteContentList == [] || !(favoriteContentList is List))}');
+    if (favoriteContentList == [] || !(favoriteContentList is List)) {
+      favoriteContentList = [content];
+    } else
+      favoriteContentList.add(content);
+
+    updateFavoriteContent(favoriteContentList);
+  }
+
+  deleteFavoriteContent(String cid) async {
+    List<dynamic> favoriteContentList = await loadFavoriteContents();
+    if (favoriteContentList != [] && (favoriteContentList is List)) {
+      favoriteContentList.removeWhere((data) => data['cid'] == cid);
+    }
+    updateFavoriteContent(favoriteContentList);
+  }
+
+  isMyFavoriteContents(String cid) async {
+    bool ismyFavoriteContents = false;
+
+    List<dynamic> json = await loadFavoriteContents();
+
+    if (json == [] || !(json is List)) {
+      return false;
+    } else {
+      for (dynamic data in json) {
+        if (data['cid'] == cid) {
+          ismyFavoriteContents = true;
+          break;
+        }
+      }
+      return ismyFavoriteContents;
+    }
   }
 }
