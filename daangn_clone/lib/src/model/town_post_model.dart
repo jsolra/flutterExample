@@ -1,3 +1,5 @@
+import 'package:get/get_connect/http/src/request/request.dart';
+
 class TownPostInfo {
   townPostCategoryType categoryType;
   String content;
@@ -58,23 +60,57 @@ class TownPostInfo {
   }
 
   // 현재 시간과 게시글 등록 시간 비교
+
   String get postTimeFromNow {
-    String str = '';
-
-    Duration diff = DateTime.now().difference(postTime);
-
-    print(diff);
-
-    if (diff.inSeconds < 60)
-      str = '${diff.inSeconds}초 전';
-    else if (diff.inMinutes < 60)
-      str = '${diff.inMinutes}분 전';
-    else if (diff.inHours < 24)
-      str = '${diff.inHours}시간 전';
-    else
-      str = '${diff.inDays}일 전';
-    return str;
+    return timeFromNow(postTime);
   }
 }
 
+String timeFromNow(DateTime postTime) {
+  String str = '';
+
+  Duration diff = DateTime.now().difference(postTime);
+
+  print(diff);
+
+  if (diff.inSeconds < 60)
+    str = '${diff.inSeconds}초 전';
+  else if (diff.inMinutes < 60)
+    str = '${diff.inMinutes}분 전';
+  else if (diff.inHours < 24)
+    str = '${diff.inHours}시간 전';
+  else
+    str = '${diff.inDays}일 전';
+  return str;
+}
+
 enum townPostCategoryType { none, question, hotPlace, ask, townInfo, report }
+
+class TownDetailInfo {
+  late TownPostInfo data;
+  List<TownCommentInfo>? commentList = [];
+  TownDetailInfo({required this.data, this.commentList});
+}
+
+class TownCommentInfo {
+  int seq;
+  int? subSeq;
+  String id;
+  String town;
+  String content;
+  DateTime postTime;
+  String? profileURL;
+
+  TownCommentInfo(
+      {required this.seq,
+      this.subSeq,
+      required this.id,
+      required this.town,
+      required this.content,
+      required this.postTime,
+      this.profileURL});
+
+  String get postTimeFromNow {
+    return timeFromNow(postTime);
+  }
+}

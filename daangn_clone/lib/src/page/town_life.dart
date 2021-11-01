@@ -1,4 +1,5 @@
 import 'package:daangn/src/component/appbar_widget.dart';
+import 'package:daangn/src/component/post_widget.dart';
 import 'package:daangn/src/controller/town_controller.dart';
 import 'package:daangn/src/model/town_post_model.dart';
 import 'package:flutter/material.dart';
@@ -413,23 +414,6 @@ class TownLifePage extends GetView<TownController> {
     );
   }
 
-  // 포스트 상단 카테고리 타입 영역
-  Widget _postCategoryType_widget(String title) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      height: 30,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.blueGrey[50],
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(fontSize: 12),
-      ),
-    );
-  }
-
   Widget _contentArea_widget(String content, townPostCategoryType type) {
     return RichText(
       overflow: TextOverflow.ellipsis,
@@ -740,106 +724,107 @@ class TownLifePage extends GetView<TownController> {
   }
 
   Widget _postContent(TownPostInfo data) {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    //상단 카테고리 타입
-                    children: [
-                      _postCategoryType_widget(data.category),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  _contentArea_widget(data.content, data.categoryType),
-                  SizedBox(height: data.imageURL == null ? 0 : 10),
-                  _imageList_widget(data.imageURL),
-                  SizedBox(height: data.storeName == null ? 0 : 15),
-                  _locationInfo_widget(data.storeName, data.storeAddress),
-                  SizedBox(height: 30),
-                  Row(
-                    //게시글 작성 정보
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${data.writer} · ${data.town}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      Text(
-                        data.postTimeFromNow,
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ],
-              )),
-          Container(
-            color: Colors.blueGrey[50],
-            height: 1,
-          ),
-          Row(
-            //하단 버튼 리스트
-            children: [
-              data.categoryType == townPostCategoryType.question
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 20),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outlined,
-                            size: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            '궁금해요',
-                          )
-                        ],
-                      ),
-                    )
-                  : Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 20),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.smart_toy_outlined,
-                            size: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            '공감하기',
-                          )
-                        ],
-                      ),
-                    ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                child: Row(
+    return InkWell(
+      onTap: () {
+        controller.setDetailData(data);
+        Get.toNamed('/townLifeDetail/1');
+      },
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Icons.message,
-                      size: 20,
+                    postCategoryType_widget(data.category),
+                    SizedBox(height: 10),
+                    _contentArea_widget(data.content, data.categoryType),
+                    SizedBox(height: data.imageURL == null ? 0 : 10),
+                    _imageList_widget(data.imageURL),
+                    SizedBox(height: data.storeName == null ? 0 : 15),
+                    _locationInfo_widget(data.storeName, data.storeAddress),
+                    SizedBox(height: 30),
+                    Row(
+                      //게시글 작성 정보
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${data.writer} · ${data.town}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        Text(
+                          data.postTimeFromNow,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5),
-                    Text(
-                      data.commentString,
-                    )
                   ],
+                )),
+            Container(
+              color: Colors.blueGrey[50],
+              height: 1,
+            ),
+            Row(
+              //하단 버튼 리스트
+              children: [
+                data.categoryType == townPostCategoryType.question
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outlined,
+                              size: 20,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              '궁금해요',
+                            )
+                          ],
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.smart_toy_outlined,
+                              size: 20,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              '공감하기',
+                            )
+                          ],
+                        ),
+                      ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.message,
+                        size: 20,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        data.commentString,
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Container(
-            color: Colors.blueGrey[50],
-            height: 10,
-          ),
-        ],
+              ],
+            ),
+            Container(
+              color: Colors.blueGrey[50],
+              height: 10,
+            ),
+          ],
+        ),
       ),
     );
   }

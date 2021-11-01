@@ -3,6 +3,11 @@ import 'package:get/get.dart';
 
 class TownController extends GetxController {
   RxList<dynamic> postData = <TownPostInfo>[].obs;
+  TownPostInfo? detailData;
+
+  void setDetailData(TownPostInfo data) {
+    detailData = data;
+  }
 
   String getCategoryType(townPostCategoryType type) {
     switch (type) {
