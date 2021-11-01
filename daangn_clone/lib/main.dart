@@ -4,12 +4,14 @@ import 'package:daangn/src/page/app.dart';
 import 'package:daangn/src/page/detail.dart';
 import 'package:daangn/src/page/favorite.dart';
 import 'package:daangn/src/page/town_life.dart';
+import 'package:daangn/tt.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 void main() {
   // runApp(TestApp());
   runApp(MyApp());
+  // runApp(MaterialApp(home: DemoApp()));
 }
 
 class MyApp extends StatelessWidget {
